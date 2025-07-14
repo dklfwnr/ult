@@ -1,163 +1,162 @@
-/****************************************************************
- *  Malla interactiva – toggle aprobar ↔ desaprobar con cascada *
- ****************************************************************/
+/*****************************************************************
+ * Malla interactiva – marcar / desmarcar + cálculo de notas
+ *  ▸ Clic  : aprueba / desaprueba un ramo
+ *  ▸ Doble clic : abre modal para ingresar notas (70 % + 30 %)
+ *****************************************************************/
 
-/* ---------- 1. Lista completa de cursos ---------- */
-const courses = [
-  /* I */
-  { id:"principios",   name:"Principios matemáticos",           sem:1, pre:[] },
-  { id:"biocel",       name:"Biología celular",                  sem:1, pre:[] },
-  { id:"quimgeneral",  name:"Química general",                   sem:1, pre:[] },
-  { id:"introTM",      name:"Introducción a la tecnología médica", sem:1, pre:[] },
-  { id:"comunicacion", name:"Taller competencias comunicativas", sem:1, pre:[] },
-  { id:"aprendizaje",  name:"Taller competencias para aprendizaje", sem:1, pre:[] },
-  { id:"personal1",    name:"Taller desarrollo personal I",      sem:1, pre:[] },
-
-  /* II */
-  { id:"biofisica",    name:"Biofísica",                        sem:2, pre:["principios", "estadisticas"] }, // Considerando que Principios matemáticos abre Biofísica y Estadísticas
-  { id:"enfermeria",   name:"Proc. de enfermería y primeros auxilios", sem:2, pre:[] },
-  { id:"quimorganica", name:"Química orgánica",                 sem:2, pre:["quimgeneral"] },
-  { id:"anatomia",     name:"Anatomía",                        sem:2, pre:[] },
-  { id:"histologia",   name:"Histología",                      sem:2, pre:[] },
-  { id:"personal2",    name:"Taller desarrollo personal II",   sem:2, pre:[] },
-  { id:"cultura",      name:"Cultura y valores",               sem:2, pre:[] },
-
-  /* III */
-  { id:"estadisticas", name:"Estadísticas para la ciencia de la salud", sem:3, pre:["principios"] },
-  { id:"inmunologia",  name:"Inmunología básica",              sem:3, pre:["histologia"] },
-  { id:"bioquimica",   name:"Fundamentos en bioquímica",       sem:3, pre:["quimorganica"] },
-  { id:"fisiologia",   name:"Fisiología",                     sem:3, pre:["anatomia"] },
-  { id:"bioseguridad", name:"Bioseguridad",                   sem:3, pre:[] },
-  { id:"persona",      name:"Persona y sentido",              sem:3, pre:[] },
-  { id:"ingles1",      name:"Inglés básico I",                sem:3, pre:[] },
-
-  /* IV */
-  { id:"saludpublica", name:"Fundamentos en salud pública",   sem:4, pre:["estadisticas"] },
-  { id:"etica",        name:"Ética en salud",                 sem:4, pre:[] },
-  { id:"morfofisiovisual", name:"Morfofisiología del sistema visual", sem:4, pre:["inmunologia"] },
-  { id:"fisiopato",    name:"Fisiopatología",                sem:4, pre:["fisiologia"] },
-  { id:"fisicaoftalmica", name:"Física oftálmica",            sem:4, pre:["biofisica"] },
-  { id:"atencion",     name:"Atención primaria oftalmológica", sem:4, pre:[] },
-  { id:"ingles2",      name:"Inglés básico II",              sem:4, pre:["ingles1"] },
-
-  /* V */
-  { id:"oftalmologia", name:"Oftalmología general",          sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
-  { id:"morfofisiopato", name:"Morfofisiopatología del sistema visual", sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
-  { id:"visionbinocular", name:"Visión binocular",            sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
-  { id:"oftalmofarma", name:"Oftalmofarmacología",           sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
-  { id:"gestion",      name:"Gestión en salud",              sem:5, pre:[] },
-
-  /* VI */
-  { id:"campovisual",  name:"Estudio del campo visual",      sem:6, pre:["oftalmologia","morfofisiopato","visionbinocular"] },
-  { id:"estrabismo",   name:"Estrabismo y ortóptica",        sem:6, pre:["oftalmologia","morfofisiopato","visionbinocular"] },
-  { id:"optobasica",   name:"Optometría clínica básica",     sem:6, pre:["oftalmologia","morfofisiopato","visionbinocular","oftalmofarma"] },
-  { id:"electivo1",    name:"Electivo I",                   sem:6, pre:[] },
-
-  /* VII */
-  { id:"neurooftalmo", name:"Neuroftalmología",             sem:7, pre:["estrabismo"] },
-  { id:"imagenologia", name:"Imagenología ocular",          sem:7, pre:["campovisual"] },
-  { id:"ecobiometria", name:"Ecobiometría ocular",          sem:7, pre:["oftalmologia"] },
-  { id:"optoavanzada", name:"Optometría clínica avanzada",  sem:7, pre:["optobasica"] },
-
-  /* VIII */
-  { id:"metodologia",   name:"Metodología de la investigación", sem:8, pre:["ecobiometria"] },
-  { id:"retina",        name:"Retina clínica",              sem:8, pre:["imagenologia"] },
-  { id:"apoyocirugia",  name:"Apoyo en cirugía refractiva", sem:8, pre:["ecobiometria"] },
-  { id:"electivo2",     name:"Electivo II",                 sem:8, pre:["electivo1"] },
-
-  /* IX */
-  { id:"seminario", name:"Seminario de investigación", sem:9, pre:["metodologia","retina","apoyocirugia"] },
-  { id:"clinica",   name:"Clínica oftálmica",           sem:9, pre:[] },
-  { id:"electivo3", name:"Electivo III",                sem:9, pre:[] },
-
-  /* X */
-  { id:"internado1", name:"Internado profesional I",  sem:10, pre:[] },
-  { id:"internado2", name:"Internado profesional II", sem:10, pre:[] },
-  { id:"internado3", name:"Internado profesional III", sem:10, pre:[] },
-  { id:"internado4", name:"Internado profesional IV",  sem:10, pre:[] },
-  { id:"titulacion", name:"Actividad de titulación",  sem:10, pre:[] }
-];
-
-/* ---------- 2. Estado ---------- */
-const done = new Set();          // ramos aprobados
-
-/* ---------- 3. Render ---------- */
 document.addEventListener("DOMContentLoaded", () => {
+
+  /* -------- 1. LISTA COMPLETA DE RAMOS y DEPENDENCIAS -------- */
+  const semesters = {
+    "I SEMESTRE": [
+      { name: "Principios matematicos", unlocks: ["Biofisica", "Estadisticas para la ciencia de la salud"] },
+      { name: "Biologia celular", unlocks: [] },
+      { name: "Quimica general", unlocks: ["Quimica organica"] },
+      { name: "Introduccion a la tecnologia medica", unlocks: [] },
+      { name: "Taller de competencias comunicativas", unlocks: [] },
+      { name: "Taller de competencias para el aprendisaje", unlocks: [] },
+      { name: "Taller de desarrollo personal I", unlocks: [] }
+    ],
+    "II SEMESTRE": [
+      { name: "Biofisica", unlocks: ["Fisica oftalmica"] },
+      { name: "Proc de enfermeria y primeros auxilios", unlocks: [] },
+      { name: "Quimica organica", unlocks: ["Fundamentos en bioquimica"] },
+      { name: "Anatomia", unlocks: ["Fisiologia"] },
+      { name: "Histologia", unlocks: ["Inmunologia basica"] },
+      { name: "Taller de desarrollo personal II", unlocks: [] },
+      { name: "Cultura y valores", unlocks: [] }
+    ],
+    "III SEMESTRE": [
+      { name: "Estadisticas para la ciencia de la salud", unlocks: ["Fundamentos en salud publica"] },
+      { name: "Inmunologia basica", unlocks: ["Morfofisiologia del sistema visual"] },
+      { name: "Fundamentos en bioquimica", unlocks: [] },
+      { name: "Fisiologia", unlocks: ["Fisiopatologia"] },
+      { name: "Bioseguridad", unlocks: [] },
+      { name: "Persona y sentido", unlocks: [] },
+      { name: "Ingles basico I", unlocks: ["Ingles basico II"] }
+    ],
+    "IV SEMESTRE": [
+      { name: "Fundamentos en salud publica", unlocks: [] },
+      { name: "Etica en salud", unlocks: [] },
+      { name: "Morfofisiologia del sistema visual", unlocks: ["Morfofisiopatologia del sistema visual","Vision binocular","Oftalmologia general","Oftalmofarmacologia"] },
+      { name: "Fisiopatologia", unlocks: ["Morfofisiopatologia del sistema visual","Vision binocular","Oftalmologia general","Oftalmofarmacologia"] },
+      { name: "Fisica oftalmica", unlocks: ["Morfofisiopatologia del sistema visual","Vision binocular","Oftalmologia general","Oftalmofarmacologia"] },
+      { name: "Atencion primaria oftalmologica", unlocks: [] },
+      { name: "Ingles basico II", unlocks: [] }
+    ],
+    "V SEMESTRE": [
+      { name: "Oftalmologia general", unlocks: ["Estudio del campo visual","Estrabismo y ortoptica","Optometria clinica basica","Ecobiometria ocular"] },
+      { name: "Morfofisiopatologia del sistema visual", unlocks: ["Estudio del campo visual","Estrabismo y ortoptica","Optometria clinica basica"] },
+      { name: "Vision binocular", unlocks: ["Estudio del campo visual","Estrabismo y ortoptica","Optometria clinica basica"] },
+      { name: "Oftalmofarmacologia", unlocks: ["Optometria clinica basica"] },
+      { name: "Gestion en salud", unlocks: [] }
+    ],
+    "VI SEMESTRE": [
+      { name: "Estudio del campo visual", unlocks: ["Imagenologia Ocular"] },
+      { name: "Estrabismo y ortoptica", unlocks: ["Neuroftalmologia"] },
+      { name: "Optometria clinica basica", unlocks: ["Optometria clinica avanzada"] },
+      { name: "ELECTIVO I", unlocks: ["ELECTIVO II"] }
+    ],
+    "VII SEMESTRE": [
+      { name: "Neuroftalmologia", unlocks: [] },
+      { name: "Imagenologia Ocular", unlocks: ["Retina clínica"] },
+      { name: "Ecobiometria ocular", unlocks: ["Metodologia de la investigacion","Apoyo en cirugia refractiva"] },
+      { name: "Optometria clinica avanzada", unlocks: [] }
+    ],
+    "VIII SEMESTRE": [
+      { name: "Metodologia de la investigacion", unlocks: ["SEMINARIO DE INVESTIGACIÓN"] },
+      { name: "Retina clínica", unlocks: ["SEMINARIO DE INVESTIGACIÓN"] },
+      { name: "Apoyo en cirugia refractiva", unlocks: ["SEMINARIO DE INVESTIGACIÓN"] },
+      { name: "ELECTIVO II", unlocks: [] }
+    ],
+    "IX SEMESTRE": [
+      { name: "SEMINARIO DE INVESTIGACIÓN", unlocks: [] },
+      { name: "CLINICA OFTALMICA", unlocks: [] },
+      { name: "ELECTIVO III", unlocks: [] }
+    ],
+    "X SEMESTRE": [
+      { name: "INTERNADO PROFESIONAL I", unlocks: [] },
+      { name: "INTERNADO PROFESIONAL II", unlocks: [] },
+      { name: "INTERNADO PROFESIONAL III", unlocks: [] },
+      { name: "INTERNADO PROFESIONAL IV", unlocks: [] }
+    ],
+    "TITULACIÓN": [
+      { name: "ACTIVIDAD DE TITULACIÓN", unlocks: [] }
+    ]
+  };
+
+  /* -------- 2. RENDER DE LA MALLA -------- */
+  const completed = new Set();
   const mesh = document.getElementById("mesh");
-  const palette = ["#c5b2f2","#bda4f0","#b496ee","#ac87ec","#a37ae9",
-                   "#9b6ce7","#925ee5","#8a50e2","#8143e0","#7837dd"];
 
-  // agrupa y crea columnas por semestre
-  [...new Set(courses.map(c=>c.sem))].sort((a,b)=>a-b).forEach(sem=>{
-    const sec=document.createElement("section");
-    sec.className="semester";
-    sec.innerHTML=`<h2>Semestre ${sem}</h2>`;
-    courses.filter(c=>c.sem===sem).forEach((c,i)=>{
-      const btn=document.createElement("button");
-      btn.className="course";
-      btn.dataset.id=c.id;
-      btn.textContent=c.name;
-      btn.style.setProperty("--border-color",palette[(i+sem)%palette.length]);
-      c.el=btn;                 // guarda referencia
-      sec.appendChild(btn);
+  Object.entries(semesters).forEach(([sem, list]) => {
+    const col = document.createElement("div");
+    col.className = "semester";
+    col.innerHTML = `<h2>${sem}</h2>`;
+    list.forEach(course => {
+      const btn = document.createElement("div");
+      btn.className = "course";
+      btn.textContent = course.name;
+      btn.dataset.name = course.name;
+      btn.onclick    = () => toggleCourse(course.name);
+      btn.ondblclick = () => openGradeModal(course.name);
+      col.appendChild(btn);
     });
-    mesh.appendChild(sec);
+    mesh.appendChild(col);
   });
 
-  // clic centralizado
-  mesh.addEventListener("click", e=>{
-    const btn=e.target.closest(".course");
-    if(!btn) return;
-    const id=btn.dataset.id;
-    const course=courses.find(c=>c.id===id);
-    if(!course) return;
+  updateState();
 
-    if(btn.classList.contains("disabled")) return; // bloqueado → nada
+  /* -------- 3. MARCAR / DESMARCAR -------- */
+  function toggleCourse(name) {
+    completed.has(name) ? completed.delete(name) : completed.add(name);
+    updateState();
+  }
 
-    if(done.has(id)){
-      unapproveCascade(id);   // quitar aprobación
-    }else{
-      done.add(id);           // aprobar
-    }
-    refreshAll();
-  });
-
-  refreshAll(); // estado inicial
-});
-
-/* ---------- 4. Lógica auxiliar ---------- */
-function unmet(c){ return c.pre.filter(p=>!done.has(p)).length }
-
-function unapproveCascade(id){
-  const stack=[id];
-  while(stack.length){
-    const current=stack.pop();
-    done.delete(current);
-
-    // cualquier ramo aprobado que dependa de este y pierde requisito se quita
-    courses.forEach(c=>{
-      if(done.has(c.id) && c.pre.includes(current) && unmet(c)){
-        stack.push(c.id);
+  function updateState() {
+    document.querySelectorAll(".course").forEach(el => {
+      const name = el.dataset.name;
+      el.classList.remove("completed","unlocked");
+      if (completed.has(name)) {
+        el.classList.add("completed");
+      } else if (isUnlocked(name)) {
+        el.classList.add("unlocked");
       }
     });
   }
-}
 
-function refreshAll(){
-  courses.forEach(c=>{
-    const el=c.el;
-    el.className="course";   // reset
-    (el.querySelector(".badge")||{}).remove?.();
+  function isUnlocked(name) {
+    return Object.values(semesters).some(list =>
+      list.some(c => completed.has(c.name) && c.unlocks.includes(name))
+    );
+  }
 
-    if(done.has(c.id)){
-      el.classList.add("completed");
-      const b=document.createElement("span");
-      b.className="badge"; b.textContent="✔";
-      el.appendChild(b);
-    }else if(unmet(c)){
-      el.classList.add("disabled");
-    }else{
-      el.classList.add("unlocked");
-    }
-  });
-}
+  /* -------- 4. MODAL CÁLCULO DE NOTAS -------- */
+  const gradeModal  = document.getElementById("gradeModal");
+  const titleEl     = document.getElementById("gradeTitle");
+  const inputPres   = document.getElementById("inputPres");
+  const inputExam   = document.getElementById("inputExam");
+  const resultEl    = document.getElementById("gradeResult");
+  document.getElementById("closeGrade").onclick = () => gradeModal.style.display = "none";
+
+  document.getElementById("saveGrade").onclick = () => gradeModal.style.display = "none";
+  inputPres.oninput = inputExam.oninput = () => {
+    const p = parseFloat(inputPres.value);
+    const e = parseFloat(inputExam.value);
+    if (isNaN(p) || isNaN(e)) { resultEl.textContent = ""; return; }
+    const final = (p*0.7 + e*0.3).toFixed(2);
+    let msg = `Nota final: ${final}`;
+    msg += final >= 5.5 ? " ✅ Eximido" : final >= 4 ? " ✔️ Aprobado" : " ❌ Reprobado";
+    resultEl.textContent = msg;
+  };
+
+  function openGradeModal(name) {
+    titleEl.textContent = `Notas para ${name}`;
+    inputPres.value = inputExam.value = ""; resultEl.textContent = "";
+    gradeModal.style.display = "flex";
+  }
+
+  /* -------- 5. BLOC DE NOTAS GENERAL -------- */
+  document.getElementById("openNotes").onclick  = () => document.getElementById("notesModal").style.display = "flex";
+  document.getElementById("closeNotes").onclick = () => document.getElementById("notesModal").style.display = "none";
+});
