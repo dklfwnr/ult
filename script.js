@@ -1,28 +1,81 @@
 /****************************************************************
- *  Malla interactiva – toggle aprobar ↔ desaprobar con cascada *
+ *  Malla interactiva – toggle aprobar ↔ desaprobar con cascada *
  ****************************************************************/
 
-/* ---------- 1. Lista de cursos ---------- */
+/* ---------- 1. Lista completa de cursos ---------- */
 const courses = [
   /* I */
-  { id:"principios",   name:"Principios matemáticos", sem:1, pre:[] },
-  { id:"biocel",       name:"Biología celular",        sem:1, pre:[] },
-  { id:"quimgeneral",  name:"Química general",         sem:1, pre:[] },
-  { id:"introTM",      name:"Introducción a TM",       sem:1, pre:[] },
-  { id:"comunicacion", name:"Comp. comunicativas",     sem:1, pre:[] },
-  { id:"aprendizaje",  name:"Comp. aprendizaje",       sem:1, pre:[] },
-  { id:"personal1",    name:"Desarrollo personal I",   sem:1, pre:[] },
+  { id:"principios",   name:"Principios matemáticos",           sem:1, pre:[] },
+  { id:"biocel",       name:"Biología celular",                  sem:1, pre:[] },
+  { id:"quimgeneral",  name:"Química general",                   sem:1, pre:[] },
+  { id:"introTM",      name:"Introducción a la tecnología médica", sem:1, pre:[] },
+  { id:"comunicacion", name:"Taller competencias comunicativas", sem:1, pre:[] },
+  { id:"aprendizaje",  name:"Taller competencias para aprendizaje", sem:1, pre:[] },
+  { id:"personal1",    name:"Taller desarrollo personal I",      sem:1, pre:[] },
 
   /* II */
-  { id:"biofisica",    name:"Biofísica",          sem:2, pre:["principios"] },
-  { id:"enfermeria",   name:"Enfermería y P.A.",  sem:2, pre:[] },
-  { id:"quimorganica", name:"Química orgánica",   sem:2, pre:["quimgeneral"] },
-  { id:"anatomia",     name:"Anatomía",           sem:2, pre:[] },
-  { id:"histologia",   name:"Histología",         sem:2, pre:[] },
-  { id:"personal2",    name:"Desarrollo personal II", sem:2, pre:[] },
-  { id:"cultura",      name:"Cultura y valores",  sem:2, pre:[] },
+  { id:"biofisica",    name:"Biofísica",                        sem:2, pre:["principios", "estadisticas"] }, // Considerando que Principios matemáticos abre Biofísica y Estadísticas
+  { id:"enfermeria",   name:"Proc. de enfermería y primeros auxilios", sem:2, pre:[] },
+  { id:"quimorganica", name:"Química orgánica",                 sem:2, pre:["quimgeneral"] },
+  { id:"anatomia",     name:"Anatomía",                        sem:2, pre:[] },
+  { id:"histologia",   name:"Histología",                      sem:2, pre:[] },
+  { id:"personal2",    name:"Taller desarrollo personal II",   sem:2, pre:[] },
+  { id:"cultura",      name:"Cultura y valores",               sem:2, pre:[] },
 
-  /* … (añade o deja los demás igual como antes) … */
+  /* III */
+  { id:"estadisticas", name:"Estadísticas para la ciencia de la salud", sem:3, pre:["principios"] },
+  { id:"inmunologia",  name:"Inmunología básica",              sem:3, pre:["histologia"] },
+  { id:"bioquimica",   name:"Fundamentos en bioquímica",       sem:3, pre:["quimorganica"] },
+  { id:"fisiologia",   name:"Fisiología",                     sem:3, pre:["anatomia"] },
+  { id:"bioseguridad", name:"Bioseguridad",                   sem:3, pre:[] },
+  { id:"persona",      name:"Persona y sentido",              sem:3, pre:[] },
+  { id:"ingles1",      name:"Inglés básico I",                sem:3, pre:[] },
+
+  /* IV */
+  { id:"saludpublica", name:"Fundamentos en salud pública",   sem:4, pre:["estadisticas"] },
+  { id:"etica",        name:"Ética en salud",                 sem:4, pre:[] },
+  { id:"morfofisiovisual", name:"Morfofisiología del sistema visual", sem:4, pre:["inmunologia"] },
+  { id:"fisiopato",    name:"Fisiopatología",                sem:4, pre:["fisiologia"] },
+  { id:"fisicaoftalmica", name:"Física oftálmica",            sem:4, pre:["biofisica"] },
+  { id:"atencion",     name:"Atención primaria oftalmológica", sem:4, pre:[] },
+  { id:"ingles2",      name:"Inglés básico II",              sem:4, pre:["ingles1"] },
+
+  /* V */
+  { id:"oftalmologia", name:"Oftalmología general",          sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
+  { id:"morfofisiopato", name:"Morfofisiopatología del sistema visual", sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
+  { id:"visionbinocular", name:"Visión binocular",            sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
+  { id:"oftalmofarma", name:"Oftalmofarmacología",           sem:5, pre:["morfofisiovisual","fisiopato","fisicaoftalmica"] },
+  { id:"gestion",      name:"Gestión en salud",              sem:5, pre:[] },
+
+  /* VI */
+  { id:"campovisual",  name:"Estudio del campo visual",      sem:6, pre:["oftalmologia","morfofisiopato","visionbinocular"] },
+  { id:"estrabismo",   name:"Estrabismo y ortóptica",        sem:6, pre:["oftalmologia","morfofisiopato","visionbinocular"] },
+  { id:"optobasica",   name:"Optometría clínica básica",     sem:6, pre:["oftalmologia","morfofisiopato","visionbinocular","oftalmofarma"] },
+  { id:"electivo1",    name:"Electivo I",                   sem:6, pre:[] },
+
+  /* VII */
+  { id:"neurooftalmo", name:"Neuroftalmología",             sem:7, pre:["estrabismo"] },
+  { id:"imagenologia", name:"Imagenología ocular",          sem:7, pre:["campovisual"] },
+  { id:"ecobiometria", name:"Ecobiometría ocular",          sem:7, pre:["oftalmologia"] },
+  { id:"optoavanzada", name:"Optometría clínica avanzada",  sem:7, pre:["optobasica"] },
+
+  /* VIII */
+  { id:"metodologia",   name:"Metodología de la investigación", sem:8, pre:["ecobiometria"] },
+  { id:"retina",        name:"Retina clínica",              sem:8, pre:["imagenologia"] },
+  { id:"apoyocirugia",  name:"Apoyo en cirugía refractiva", sem:8, pre:["ecobiometria"] },
+  { id:"electivo2",     name:"Electivo II",                 sem:8, pre:["electivo1"] },
+
+  /* IX */
+  { id:"seminario", name:"Seminario de investigación", sem:9, pre:["metodologia","retina","apoyocirugia"] },
+  { id:"clinica",   name:"Clínica oftálmica",           sem:9, pre:[] },
+  { id:"electivo3", name:"Electivo III",                sem:9, pre:[] },
+
+  /* X */
+  { id:"internado1", name:"Internado profesional I",  sem:10, pre:[] },
+  { id:"internado2", name:"Internado profesional II", sem:10, pre:[] },
+  { id:"internado3", name:"Internado profesional III", sem:10, pre:[] },
+  { id:"internado4", name:"Internado profesional IV",  sem:10, pre:[] },
+  { id:"titulacion", name:"Actividad de titulación",  sem:10, pre:[] }
 ];
 
 /* ---------- 2. Estado ---------- */
