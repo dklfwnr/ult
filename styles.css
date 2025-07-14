@@ -1,0 +1,47 @@
+/* ——— Reset & básicos ——— */
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Nunito',sans-serif;
+  background:#faf7ff;
+  color:#45345d;
+  padding:2rem;
+  line-height:1.5
+}
+
+h1{font-size:2rem;text-align:center;color:#7a4eb0;margin-bottom:1rem}
+p{max-width:900px;margin:0 auto 2rem;text-align:center}
+
+/* —— Contenedor malla —— */
+#mesh{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2.5rem}
+.semester{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;padding-top:1.5rem;border-top:2px dashed #c8b8e6}
+.semester h2{grid-column:1/-1;font-size:1.3rem;font-weight:700;color:#5e3d95;margin-bottom:.5rem}
+
+/* —— Tarjeta Ram o —— */
+.course{
+  position:relative;padding:1rem 1.2rem;min-height:90px;
+  background:#f3edff;border:3px solid var(--border-color,#bba5e7);
+  border-radius:16px;font-size:.95rem;font-weight:600;color:#45345d;
+  cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s;
+  box-shadow:2px 2px 8px rgba(0,0,0,.07);text-align:left
+}
+.course:hover:not(.disabled):not(.completed){
+  transform:translateY(-3px);box-shadow:4px 6px 14px rgba(0,0,0,.12)
+}
+
+/* —— Estados —— */
+.course.disabled{opacity:.45;cursor:default;background:#eae2ff;box-shadow:none}
+.course.unlocked{background:#e9e2ff;border-style:dashed}        /* recién habilitado */
+.course.completed{
+  background:#d8d2e8;border-color:var(--border-color,#9e7bd2);color:#4a356d;
+  text-decoration:line-through;opacity:.85                /* tachado */
+}
+
+/* ✔ etiqueta */
+.badge{
+  position:absolute;top:8px;right:12px;padding:3px 7px;font-size:.75rem;font-weight:700;
+  color:#fff;background:var(--border-color,#7a4eb0);border-radius:8px;
+  box-shadow:1px 1px 3px rgba(0,0,0,.15)
+}
+
+@media(max-width:600px){.semester{grid-template-columns:1fr}}
