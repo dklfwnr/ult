@@ -1,107 +1,87 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  font-family: 'Nunito', sans-serif;
-  background: #faf7ff;
-  color: #45345d;
-  padding: 2rem;
+  font-family: sans-serif;
+  background: #f9f6ff;
+  color: #333;
+  padding: 1rem;
 }
 
 h1 {
   text-align: center;
-  font-size: 2rem;
-  color: #7a4eb0;
-  margin-bottom: 1rem;
-}
-
-p {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto 2rem;
-}
-
-/* Malla contenedor */
-#mesh {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
+  color: #8e44ad;
 }
 
 .semester {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
-  padding-top: 1.5rem;
-  border-top: 2px dashed #c8b8e6;
+  display: inline-block;
+  vertical-align: top;
+  width: 220px;
+  margin: 1rem;
+  padding: 1rem;
+  background: #efe5ff;
+  border-radius: 10px;
 }
 
 .semester h2 {
-  grid-column: 1 / -1;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #5e3d95;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #6c3483;
+  text-align: center;
 }
 
-/* Botón-ramos */
 .course {
-  position: relative;
-  padding: 1rem 1.2rem;
-  background: #f3edff;
-  border: 3px solid var(--border-color, #bba5e7);
-  border-radius: 16px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #45345d;
+  background: white;
+  border: 2px solid #bbb;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.07);
-  text-align: left;
-}
-
-.course:hover:not(.disabled):not(.completed) {
-  transform: translateY(-3px);
-  box-shadow: 4px 6px 14px rgba(0,0,0,0.12);
-}
-
-.course.disabled {
-  opacity: 0.45;
-  cursor: default;
-  background: #eae2ff;
-  box-shadow: none;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 .course.unlocked {
-  background: #ece1ff;
-  border-style: dashed;
+  border-color: #a569bd;
+  background: #f4ecf7;
 }
 
 .course.completed {
-  background: #d8d2e8;
-  border-color: var(--border-color, #9e7bd2);
-  color: #4a356d;
+  background: #d5f5e3;
   text-decoration: line-through;
-  opacity: 0.85;
 }
 
-/* ✔ check aprobado */
-.badge {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  padding: 3px 7px;
-  font-size: 0.75rem;
-  font-weight: 700;
+button {
+  display: block;
+  margin: 1rem auto;
+  padding: 8px 20px;
+  border: none;
+  background: #d2b4de;
   color: #fff;
-  background: var(--border-color, #7a4eb0);
-  border-radius: 8px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,.15);
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-@media (max-width: 600px) {
-  .semester {
-    grid-template-columns: 1fr;
-  }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+  font-size: 20px;
+  color: #888;
 }
