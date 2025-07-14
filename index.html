@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malla Interactiva Tecnología Médica</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Malla Interactiva Tecnología Médica</h1>
+  <div id="mesh"></div>
+  <button id="openNotes">📝 Bloc de notas</button>
+
+  <!-- Modal notas -->
+  <div id="gradeModal" class="modal">
+    <div class="modal-content">
+      <span id="closeGrade" class="close">&times;</span>
+      <h3 id="gradeTitle"></h3>
+      <label>Nota presentación (70%): <input type="number" id="inputPres" min="1" max="7" step="0.1"></label><br><br>
+      <label>Nota examen (30%): <input type="number" id="inputExam" min="1" max="7" step="0.1"></label><br><br>
+      <div id="gradeResult" style="font-weight:bold;"></div><br>
+      <button id="saveGrade">Guardar Nota</button>
+    </div>
+  </div>
+
+  <!-- Bloc de notas -->
+  <div id="notesModal" class="modal">
+    <div class="modal-content">
+      <span id="closeNotes" class="close">&times;</span>
+      <h3>Bloc de Notas General</h3>
+      <textarea id="generalNotes" rows="10" cols="50" placeholder="Escribe tus notas aquí..."></textarea>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
