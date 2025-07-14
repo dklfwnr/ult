@@ -1,12 +1,4 @@
-/*****************************************************************
- * Malla interactiva – marcar / desmarcar + cálculo de notas
- *  ▸ Clic  : aprueba / desaprueba un ramo
- *  ▸ Doble clic : abre modal para ingresar notas (70 % + 30 %)
- *****************************************************************/
-
 document.addEventListener("DOMContentLoaded", () => {
-
-  /* -------- 1. LISTA COMPLETA DE RAMOS y DEPENDENCIAS -------- */
   const semesters = {
     "I SEMESTRE": [
       { name: "Principios matematicos", unlocks: ["Biofisica", "Estadisticas para la ciencia de la salud"] },
@@ -38,16 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
     "IV SEMESTRE": [
       { name: "Fundamentos en salud publica", unlocks: [] },
       { name: "Etica en salud", unlocks: [] },
-      { name: "Morfofisiologia del sistema visual", unlocks: ["Morfofisiopatologia del sistema visual","Vision binocular","Oftalmologia general","Oftalmofarmacologia"] },
-      { name: "Fisiopatologia", unlocks: ["Morfofisiopatologia del sistema visual","Vision binocular","Oftalmologia general","Oftalmofarmacologia"] },
-      { name: "Fisica oftalmica", unlocks: ["Morfofisiopatologia del sistema visual","Vision binocular","Oftalmologia general","Oftalmofarmacologia"] },
+      { name: "Morfofisiologia del sistema visual", unlocks: ["Morfofisiopatologia del sistema visual", "Vision binocular", "Oftalmologia general", "Oftalmofarmacologia"] },
+      { name: "Fisiopatologia", unlocks: ["Morfofisiopatologia del sistema visual", "Vision binocular", "Oftalmologia general", "Oftalmofarmacologia"] },
+      { name: "Fisica oftalmica", unlocks: ["Morfofisiopatologia del sistema visual", "Vision binocular", "Oftalmologia general", "Oftalmofarmacologia"] },
       { name: "Atencion primaria oftalmologica", unlocks: [] },
       { name: "Ingles basico II", unlocks: [] }
     ],
     "V SEMESTRE": [
-      { name: "Oftalmologia general", unlocks: ["Estudio del campo visual","Estrabismo y ortoptica","Optometria clinica basica","Ecobiometria ocular"] },
-      { name: "Morfofisiopatologia del sistema visual", unlocks: ["Estudio del campo visual","Estrabismo y ortoptica","Optometria clinica basica"] },
-      { name: "Vision binocular", unlocks: ["Estudio del campo visual","Estrabismo y ortoptica","Optometria clinica basica"] },
+      { name: "Oftalmologia general", unlocks: ["Estudio del campo visual", "Estrabismo y ortoptica", "Optometria clinica basica", "Ecobiometria ocular"] },
+      { name: "Morfofisiopatologia del sistema visual", unlocks: ["Estudio del campo visual", "Estrabismo y ortoptica", "Optometria clinica basica"] },
+      { name: "Vision binocular", unlocks: ["Estudio del campo visual", "Estrabismo y ortoptica", "Optometria clinica basica"] },
       { name: "Oftalmofarmacologia", unlocks: ["Optometria clinica basica"] },
       { name: "Gestion en salud", unlocks: [] }
     ],
@@ -60,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "VII SEMESTRE": [
       { name: "Neuroftalmologia", unlocks: [] },
       { name: "Imagenologia Ocular", unlocks: ["Retina clínica"] },
-      { name: "Ecobiometria ocular", unlocks: ["Metodologia de la investigacion","Apoyo en cirugia refractiva"] },
+      { name: "Ecobiometria ocular", unlocks: ["Metodologia de la investigacion", "Apoyo en cirugia refractiva"] },
       { name: "Optometria clinica avanzada", unlocks: [] }
     ],
     "VIII SEMESTRE": [
@@ -85,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ]
   };
 
-  /* -------- 2. RENDER DE LA MALLA -------- */
   const completed = new Set();
   const mesh = document.getElementById("mesh");
 
@@ -98,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.className = "course";
       btn.textContent = course.name;
       btn.dataset.name = course.name;
-      btn.onclick    = () => toggleCourse(course.name);
+      btn.onclick = () => toggleCourse(course.name);
       btn.ondblclick = () => openGradeModal(course.name);
       col.appendChild(btn);
     });
@@ -107,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateState();
 
-  /* -------- 3. MARCAR / DESMARCAR -------- */
   function toggleCourse(name) {
     completed.has(name) ? completed.delete(name) : completed.add(name);
     updateState();
@@ -116,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateState() {
     document.querySelectorAll(".course").forEach(el => {
       const name = el.dataset.name;
-      el.classList.remove("completed","unlocked");
+      el.classList.remove("completed", "unlocked");
       if (completed.has(name)) {
         el.classList.add("completed");
       } else if (isUnlocked(name)) {
@@ -131,32 +121,59 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  /* -------- 4. MODAL CÁLCULO DE NOTAS -------- */
-  const gradeModal  = document.getElementById("gradeModal");
-  const titleEl     = document.getElementById("gradeTitle");
-  const inputPres   = document.getElementById("inputPres");
-  const inputExam   = document.getElementById("inputExam");
-  const resultEl    = document.getElementById("gradeResult");
+  // ---------------- MODAL DE NOTAS ----------------
+  const gradeModal = document.getElementById("gradeModal");
+  const titleEl = document.getElementById("gradeTitle");
+  const inputPres = document.getElementById("inputPres");
+  const inputExam = document.getElementById("inputExam");
+  const resultEl = document.getElementById("gradeResult");
+  const saveBtn = document.getElementById("saveGrade");
+
+  let currentCourse = "";
+
   document.getElementById("closeGrade").onclick = () => gradeModal.style.display = "none";
 
-  document.getElementById("saveGrade").onclick = () => gradeModal.style.display = "none";
-  inputPres.oninput = inputExam.oninput = () => {
+  inputPres.oninput = inputExam.oninput = calcularNotaFinal;
+
+  function calcularNotaFinal() {
     const p = parseFloat(inputPres.value);
     const e = parseFloat(inputExam.value);
     if (isNaN(p) || isNaN(e)) { resultEl.textContent = ""; return; }
-    const final = (p*0.7 + e*0.3).toFixed(2);
+    const final = (p * 0.7 + e * 0.3).toFixed(2);
     let msg = `Nota final: ${final}`;
     msg += final >= 5.5 ? " ✅ Eximido" : final >= 4 ? " ✔️ Aprobado" : " ❌ Reprobado";
     resultEl.textContent = msg;
-  };
+  }
 
   function openGradeModal(name) {
+    currentCourse = name;
     titleEl.textContent = `Notas para ${name}`;
-    inputPres.value = inputExam.value = ""; resultEl.textContent = "";
+    const saved = JSON.parse(localStorage.getItem("notas_" + name)) || {};
+    inputPres.value = saved.pres || "";
+    inputExam.value = saved.exam || "";
+    calcularNotaFinal();
     gradeModal.style.display = "flex";
   }
 
-  /* -------- 5. BLOC DE NOTAS GENERAL -------- */
-  document.getElementById("openNotes").onclick  = () => document.getElementById("notesModal").style.display = "flex";
-  document.getElementById("closeNotes").onclick = () => document.getElementById("notesModal").style.display = "none";
+  saveBtn.onclick = () => {
+    const pres = parseFloat(inputPres.value);
+    const exam = parseFloat(inputExam.value);
+    if (!isNaN(pres) && !isNaN(exam)) {
+      localStorage.setItem("notas_" + currentCourse, JSON.stringify({ pres, exam }));
+    }
+    gradeModal.style.display = "none";
+  };
+
+  // ---------------- NOTAS GENERALES ----------------
+  document.getElementById("openNotes").onclick = () => {
+    const notes = localStorage.getItem("general_notes") || "";
+    document.getElementById("generalNotes").value = notes;
+    document.getElementById("notesModal").style.display = "flex";
+  };
+
+  document.getElementById("closeNotes").onclick = () => {
+    const notes = document.getElementById("generalNotes").value;
+    localStorage.setItem("general_notes", notes);
+    document.getElementById("notesModal").style.display = "none";
+  };
 });
